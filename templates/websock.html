@@ -1,0 +1,58 @@
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+import asyncio
+import random
+import json
+
+app = FastAPI()
+
+# Weather conditions we'll randomly cycle through
+WEATHER_CONDITIONS = [
+    "Sunny", "Partly Cloudy", "Cloudy", "Rainy", "Thunderstorm", "Snowy", "Windy"
+]
+
+# Cities we'll provide updates for
+CITIES = {
+    "new_york": {"name": "New York"},
+    "london": {"name": "London"},
+    "tokyo": {"name": "Tokyo"},
+    "sydney": {"name": "Sydney"}
+}
+
+@app.websocket("/ws/weather/{city_id}")
+async def weather_updates(websocket: WebSocket, city_id: str):
+    # Verify the city exists
+    if city_id not in CITIES:
+        await websocket.close(code=1008, reason="Invalid city")
+        return
+    
+    # Accept the connection
+    await websocket.accept()
+    
+    # Send welcome message
+    await websocket.send_text(f"Connected to weather updates for {CITIES[city_id]['name']}")
+    
+    try:
+        # Keep connection open and send updates
+        while True:
+            # Generate random weather data
+            temperature = random.randint(0, 35)  # Celsius
+            humidity = random.randint(30, 95)  # Percentage
+            condition = random.choice(WEATHER_CONDITIONS)
+            
+            # Create weather update
+            weather_data = {
+                "city": CITIES[city_id]["name"],
+                "temperature": temperature,
+                "humidity": humidity,
+                "condition": condition,
+                "updated_at": f"{asyncio.get_event_loop().time():.0f}"
+            }
+            
+            # Send the update to the client
+            await websocket.send_json(weather_data)
+            
+            # Wait before sending the next update
+            await asyncio.sleep(3)  # Update every 3 seconds
+            
+    except WebSocketDisconnect:
+        print(f"Client disconnected from {CITIES[city_id]['name']} weather updates")

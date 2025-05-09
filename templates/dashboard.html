@@ -1,0 +1,421 @@
+{% include "base1.html" %}
+
+    <div class="container py-4" id="main-content">
+        {% if flash %}
+        <div id="flash-message" class="alert alert-success">{{ flash }}</div>
+      {% endif %}
+       
+      {% extends "base.html" %}
+
+{% block title %} 
+  <title>Interactive Chat Application</title>
+{% endblock %} 
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-6 lg:p-8">
+  <!-- Main Container -->
+  <div class="max-w-6xl mx-auto">
+    <div class="flex flex-col lg:flex-row gap-6">
+      
+      <!-- Left Side - Chat History -->
+      <div class="w-full lg:w-2/3 bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 text-white">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold">Chat Room</h2>
+            <div class="flex items-center">
+              <span id="connection-status" class="flex items-center">
+                <span id="status-indicator" class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
+                <span id="status-text">Connecting...</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Chat Area -->
+        <div id="chat-container" class="h-96 md:h-[450px] lg:h-[500px] overflow-y-auto p-4 bg-gray-50">
+          <!-- Messages will be inserted here by JavaScript -->
+        </div>
+        
+        <!-- Message Input -->
+        <div class="p-4 bg-white border-t border-gray-200">
+          <div class="flex items-end gap-2">
+            <div class="flex-grow">
+              <textarea 
+                id="msg" 
+                placeholder="Type your message here..." 
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                rows="3"
+              ></textarea>
+              <div id="typing-indicator" class="text-xs text-gray-500 h-5 mt-1 italic hidden">Someone is typing...</div>
+            </div>
+            <button 
+              onclick="sendMessage()" 
+              id="send-button"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-all duration-200 flex items-center justify-center min-w-16"
+            >
+              <span>Send</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Side - Active Users & Settings -->
+      <div class="w-full lg:w-1/3 space-y-6">
+        <!-- Active Users Card -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gradient-to-r from-emerald-600 to-teal-700 p-4 text-white">
+            <h2 class="text-lg font-bold">Active Now</h2>
+          </div>
+          <div class="p-4">
+            <div id="active-users" class="space-y-3">
+              <div class="flex items-center p-2 rounded-lg border border-green-200 bg-green-50">
+                <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                <span>You</span>
+                <span class="ml-auto text-xs text-gray-500">online</span>
+              </div>
+              <!-- Other active users will be added here -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Settings Card -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div class="bg-gradient-to-r from-purple-600 to-violet-700 p-4 text-white">
+            <h2 class="text-lg font-bold">Settings</h2>
+          </div>
+          <div class="p-4 space-y-4">
+            <div>
+              <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+              <input 
+                type="text" 
+                id="username" 
+                placeholder="Enter your name" 
+                value="Guest" 
+                class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              >
+            </div>
+            <div>
+              <label class="flex items-center">
+                <input type="checkbox" id="sound-notifications" class="rounded text-purple-600 focus:ring-purple-500 mr-2">
+                <span class="text-sm text-gray-700">Sound notifications</span>
+              </label>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Theme</label>
+              <select id="theme-selector" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="system">System</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Utility functions
+function formatTime() {
+  const now = new Date();
+  return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Message display functions
+function addSystemMessage(text) {
+  const chatContainer = document.getElementById('chat-container');
+  const messageElement = document.createElement('div');
+  messageElement.className = 'flex justify-center my-2';
+  messageElement.innerHTML = `
+    <span class="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+      ${escapeHtml(text)}
+    </span>
+  `;
+  chatContainer.appendChild(messageElement);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function addChatMessage(message, sender, isSelf = false) {
+  const chatContainer = document.getElementById('chat-container');
+  const messageElement = document.createElement('div');
+  
+  if (isSelf) {
+    messageElement.className = 'flex flex-col items-end mb-4';
+    messageElement.innerHTML = `
+      <div class="flex items-center mb-1">
+        <span class="text-xs text-gray-500 mr-2">${formatTime()}</span>
+        <span class="font-medium text-sm text-blue-600">${escapeHtml(sender)}</span>
+      </div>
+      <div class="bg-blue-600 text-white px-4 py-2 rounded-lg rounded-tr-none max-w-[80%]">
+        ${escapeHtml(message)}
+      </div>
+    `;
+  } else {
+    messageElement.className = 'flex flex-col items-start mb-4';
+    messageElement.innerHTML = `
+      <div class="flex items-center mb-1">
+        <span class="font-medium text-sm text-gray-700">${escapeHtml(sender)}</span>
+        <span class="text-xs text-gray-500 ml-2">${formatTime()}</span>
+      </div>
+      <div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg rounded-tl-none max-w-[80%]">
+        ${escapeHtml(message)}
+      </div>
+    `;
+  }
+  
+  chatContainer.appendChild(messageElement);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// Typing indicator functions
+let typingTimeout;
+function showTypingIndicator() {
+  document.getElementById('typing-indicator').classList.remove('hidden');
+}
+
+function hideTypingIndicator() {
+  document.getElementById('typing-indicator').classList.add('hidden');
+}
+
+// Connection status functions
+function updateConnectionStatus(connected) {
+  const statusIndicator = document.getElementById('status-indicator');
+  const statusText = document.getElementById('status-text');
+  
+  if (connected) {
+    statusIndicator.className = 'w-3 h-3 bg-green-500 rounded-full mr-2';
+    statusText.textContent = 'Connected';
+  } else {
+    statusIndicator.className = 'w-3 h-3 bg-red-500 rounded-full mr-2';
+    statusText.textContent = 'Disconnected';
+  }
+}
+
+// WebSocket functionality
+let ws;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+
+function connectWebSocket() {
+  ws = new WebSocket("ws://" + window.location.host + "/ws");
+  
+  ws.onopen = function(event) {
+    updateConnectionStatus(true);
+    reconnectAttempts = 0;
+    addSystemMessage("Connected to chat server");
+    
+    // Send initial user info
+    const username = document.getElementById('username').value || 'Guest';
+    ws.send(JSON.stringify({
+      type: 'user_joined',
+      username: username
+    }));
+  };
+  
+  ws.onmessage = function(event) {
+    try {
+      const data = JSON.parse(event.data);
+      
+      switch(data.type) {
+        case 'chat_message':
+          addChatMessage(data.message, data.username, data.username === document.getElementById('username').value);
+          if (document.getElementById('sound-notifications').checked) {
+            // Play notification sound if implemented
+          }
+          break;
+        case 'user_joined':
+          addSystemMessage(`${data.username} has joined the chat`);
+          updateActiveUsers(data.active_users);
+          break;
+        case 'user_left':
+          addSystemMessage(`${data.username} has left the chat`);
+          updateActiveUsers(data.active_users);
+          break;
+        case 'typing':
+          if (data.username !== document.getElementById('username').value) {
+            showTypingIndicator();
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(hideTypingIndicator, 2000);
+          }
+          break;
+        default:
+          // Handle plain text for backward compatibility
+          addChatMessage(data, 'Anonymous');
+      }
+    } catch (e) {
+      // Handle plain text for backward compatibility
+      addChatMessage(event.data, 'Anonymous');
+    }
+  };
+  
+  ws.onclose = function(event) {
+    updateConnectionStatus(false);
+    addSystemMessage("Disconnected from chat server");
+    
+    // Attempt to reconnect
+    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+      reconnectAttempts++;
+      const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+      addSystemMessage(`Reconnecting in ${delay/1000} seconds...`);
+      setTimeout(connectWebSocket, delay);
+    } else {
+      addSystemMessage("Failed to reconnect. Please refresh the page.");
+    }
+  };
+  
+  ws.onerror = function(event) {
+    addSystemMessage("Connection error occurred");
+  };
+}
+
+// Update the active users list
+function updateActiveUsers(users) {
+  const activeUsersContainer = document.getElementById('active-users');
+  // Keep the current user at top
+  const currentUsername = document.getElementById('username').value || 'Guest';
+  
+  // Clear previous users except self
+  const selfUser = activeUsersContainer.firstChild;
+  activeUsersContainer.innerHTML = '';
+  activeUsersContainer.appendChild(selfUser);
+  
+  // Add other users
+  if (users && Array.isArray(users)) {
+    users.forEach(user => {
+      if (user !== currentUsername) {
+        const userElement = document.createElement('div');
+        userElement.className = 'flex items-center p-2 rounded-lg border border-green-200 bg-green-50';
+        userElement.innerHTML = `
+          <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+          <span>${escapeHtml(user)}</span>
+          <span class="ml-auto text-xs text-gray-500">online</span>
+        `;
+        activeUsersContainer.appendChild(userElement);
+      }
+    });
+  }
+}
+
+// Send message function
+function sendMessage() {
+  const messageInput = document.getElementById('msg');
+  const message = messageInput.value.trim();
+  const username = document.getElementById('username').value || 'Guest';
+  
+  if (message && ws && ws.readyState === WebSocket.OPEN) {
+    try {
+      ws.send(JSON.stringify({
+        type: 'chat_message',
+        message: message,
+        username: username
+      }));
+      messageInput.value = '';
+      messageInput.focus();
+    } catch (e) {
+      // Fallback to plain text for backward compatibility
+      ws.send(message);
+      messageInput.value = '';
+      messageInput.focus();
+    }
+  }
+}
+
+// Handle typing indicator
+let isTyping = false;
+function handleTyping() {
+  if (!isTyping && ws && ws.readyState === WebSocket.OPEN) {
+    isTyping = true;
+    const username = document.getElementById('username').value || 'Guest';
+    
+    try {
+      ws.send(JSON.stringify({
+        type: 'typing',
+        username: username
+      }));
+    } catch (e) {
+      // Silently fail if JSON not supported
+    }
+    
+    // Reset typing flag after 2 seconds
+    setTimeout(() => {
+      isTyping = false;
+    }, 2000);
+  }
+}
+
+// Theme switching
+function setTheme(theme) {
+  const isDark = theme === 'dark' || 
+                (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
+  if (isDark) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+  
+  localStorage.setItem('chat-theme', theme);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  // Connect to WebSocket
+  connectWebSocket();
+  
+  // Set up event listeners
+  document.getElementById('msg').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    } else {
+      handleTyping();
+    }
+  });
+  
+  document.getElementById('username').addEventListener('change', function() {
+    localStorage.setItem('chat-username', this.value);
+  });
+  
+  document.getElementById('sound-notifications').addEventListener('change', function() {
+    localStorage.setItem('chat-notifications', this.checked);
+  });
+  
+  document.getElementById('theme-selector').addEventListener('change', function() {
+    setTheme(this.value);
+  });
+  
+  // Load saved settings
+  const savedUsername = localStorage.getItem('chat-username');
+  if (savedUsername) {
+    document.getElementById('username').value = savedUsername;
+  }
+  
+  const savedNotifications = localStorage.getItem('chat-notifications');
+  if (savedNotifications !== null) {
+    document.getElementById('sound-notifications').checked = savedNotifications === 'true';
+  }
+  
+  const savedTheme = localStorage.getItem('chat-theme') || 'light';
+  document.getElementById('theme-selector').value = savedTheme;
+  setTheme(savedTheme);
+});
+
+<script>
+    setTimeout(function (){
+        var flashmsg = document.getElementById("flash-message")
+        if (flashmsg){
+            flashmsg.style.display="none";
+        }
+    },2000); // 2000 milliseconds = 2 seconds
+      </script>
+</script>
+{% endblock %}
+

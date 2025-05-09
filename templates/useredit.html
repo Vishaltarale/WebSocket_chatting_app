@@ -1,0 +1,84 @@
+
+{% include "base1.html" %}
+    <div class="container">
+        <h1>Edit User</h1>
+        <form action="/useredit" method="POST">
+            <div class="form-group">
+                <input type="hidden" name="id" value="{{ data['_id'] }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" value="{{ data['email'] }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" value="{{ data['password'] }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="repassword">Re-enter Password</label>
+                <input type="password" name="repassword" id="repassword" value="{{ data['repassword'] }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" name="country" id="country" value="{{ data['country'] }}">
+            </div>
+            
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Us</h3>
+                <ul>
+                    <li><a href="#">Company</a></li>
+                    <li><a href="#">Team</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Dashboard. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Toggle dropdown when clicking on Profile
+        document.getElementById('profile').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('profile-dropdown').classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(e) {
+            if (!e.target.matches('#profile')) {
+                const dropdown = document.getElementById('profile-dropdown');
+                if (dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

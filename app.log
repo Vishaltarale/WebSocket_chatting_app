@@ -1,0 +1,72 @@
+2025-03-25 16:55:35,746 - INFO - not math 121 with  322
+2025-03-25 16:56:12,683 - INFO - successfully shivraj@gmail.com registered
+2025-04-22 10:53:45,309 - INFO - Will watch for changes in these directories: ['D:\\Interglad\\INTERGLAD\\FASTAPI']
+2025-04-22 10:53:45,317 - INFO - Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+2025-04-22 10:53:45,322 - INFO - Started reloader process [2264] using WatchFiles
+2025-04-22 10:53:47,941 - INFO - Started server process [10248]
+2025-04-22 10:53:47,948 - INFO - Waiting for application startup.
+2025-04-22 10:53:47,951 - INFO - Application startup complete.
+2025-04-22 10:58:35,833 - INFO - 1 change detected
+2025-04-22 10:58:35,839 - WARNING - WatchFiles detected changes in 'practice.py'. Reloading...
+2025-04-22 10:58:35,974 - INFO - Shutting down
+2025-04-22 10:58:36,089 - INFO - Waiting for application shutdown.
+2025-04-22 10:58:36,091 - INFO - Application shutdown complete.
+2025-04-22 10:58:36,093 - INFO - Finished server process [10248]
+2025-04-22 10:58:37,241 - INFO - 1 change detected
+2025-04-22 10:58:39,597 - INFO - Started server process [10032]
+2025-04-22 10:58:39,603 - INFO - Waiting for application startup.
+2025-04-22 10:58:39,605 - INFO - Application startup complete.
+2025-04-22 10:58:39,856 - ERROR - Traceback (most recent call last):
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 719, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+asyncio.exceptions.CancelledError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 123, in run
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\routing.py", line 699, in lifespan
+    await receive()
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python313\Lib\site-packages\uvicorn\lifespan\on.py", line 137, in receive
+    return await self.receive_queue.get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\USER\AppData\Local\Programs\Python\Python313\Lib\asyncio\queues.py", line 186, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+2025-04-22 10:58:40,498 - INFO - Stopping reloader process [2264]
+2025-04-22 11:44:30,795 - INFO - Will watch for changes in these directories: ['D:\\Interglad\\INTERGLAD\\FASTAPI']
+2025-04-22 11:44:30,800 - INFO - Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+2025-04-22 11:44:30,802 - INFO - Started reloader process [6212] using WatchFiles
+2025-04-22 11:44:33,165 - INFO - Started server process [12328]
+2025-04-22 11:44:33,171 - INFO - Waiting for application startup.
+2025-04-22 11:44:33,173 - INFO - Application startup complete.
+2025-04-22 11:44:49,145 - INFO - successfully abc1@gmail.com registered
+2025-04-22 11:46:29,357 - INFO - 1 change detected
+2025-04-22 11:46:29,359 - WARNING - WatchFiles detected changes in 'practice.py'. Reloading...
+2025-04-22 11:46:29,452 - INFO - Shutting down
+2025-04-22 11:46:29,569 - INFO - Waiting for application shutdown.
+2025-04-22 11:46:29,572 - INFO - Application shutdown complete.
+2025-04-22 11:46:29,575 - INFO - Finished server process [12328]
+2025-04-22 11:46:30,568 - INFO - 1 change detected
+2025-04-22 11:46:32,846 - INFO - Started server process [1392]
+2025-04-22 11:46:32,856 - INFO - Waiting for application startup.
+2025-04-22 11:46:32,858 - INFO - Application startup complete.
+2025-04-22 11:46:33,929 - INFO - Shutting down
+2025-04-22 11:46:34,043 - INFO - Waiting for application shutdown.
+2025-04-22 11:46:34,046 - INFO - Application shutdown complete.
+2025-04-22 11:46:34,050 - INFO - Finished server process [1392]
+2025-04-22 11:46:34,716 - INFO - Stopping reloader process [6212]
