@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Live Notifications</title>
+    </head>
+    <body>
+        <h2>🔔 Notifications:</h2>
+        <ul id="notifications"></ul>
+        <script>
+            const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            let ws = new WebSocket(wsUrl);
+            
+            ws.onmessage = function(event) {
+                let messages = document.getElementById('notifications');
+                let li = document.createElement('li');
+                li.textContent = event.data;
+                messages.appendChild(li);
+            };
+            
+ 
+        </script>
+    </body>
+</html>
